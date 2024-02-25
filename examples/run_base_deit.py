@@ -359,7 +359,7 @@ def main():
 
     def val_transforms(example_batch):
         """Apply _val_transforms across a batch."""
-        example_batch["pixel_values"] = [_val_transforms(pil_img.convert("RGB")) for pil_img in example_batch["image"]]
+        example_batch["pixel_values"] = [_val_transforms(pil_img.convert("RGB")) for pil_img in example_batch["img"]]
         return example_batch
 
     if training_args.do_train:
