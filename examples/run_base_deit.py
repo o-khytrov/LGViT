@@ -353,13 +353,13 @@ def main():
     def train_transforms(example_batch):
         """Apply _train_transforms across a batch."""
         example_batch["pixel_values"] = [
-            _train_transforms(pil_img.convert("RGB")).to(device) for pil_img in example_batch["img"]
+            _train_transforms(pil_img.convert("RGB")) for pil_img in example_batch["img"]
         ]
         return example_batch
 
     def val_transforms(example_batch):
         """Apply _val_transforms across a batch."""
-        example_batch["pixel_values"] = [_val_transforms(pil_img.convert("RGB")).to(device) for pil_img in example_batch["img"]]
+        example_batch["pixel_values"] = [_val_transforms(pil_img.convert("RGB")) for pil_img in example_batch["img"]]
         return example_batch
 
     if training_args.do_train:
@@ -383,8 +383,6 @@ def main():
         # Set the validation transforms
         dataset["validation"].set_transform(val_transforms)
 
-
-    model.to(device)
 
     # Initalize our trainer
     trainer = Trainer(
