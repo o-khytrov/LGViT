@@ -463,5 +463,5 @@ def local_debugging():
 if __name__ == "__main__":
     sys.path.append('/usr/local/anaconda3/envs/tf_hjw/lib/python3.9/site-packages/transformers')
     sys.path.append('/usr/local/anaconda3/envs/tf_hjw/lib/python3.9/site-packages/transformers/trainer.py')
-    local_debugging()
+    #local_debugging()
     main()
