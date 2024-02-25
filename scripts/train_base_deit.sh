@@ -1,6 +1,5 @@
 path="$(dirname "$(pwd)")"
 model_path="$path/models/deit_highway"
-echo $model_path
 export PYTHONPATH=$path:$PYTHONPATH         # Add path to the beginning of the search path
 export PYTHONPATH="$PYTHONPATH:$model_path" # Add the model path to the end of the search path
 
@@ -9,7 +8,7 @@ MODEL_TYPE=${BACKBONE}-base
 MODEL_NAME=facebook/deit-base-distilled-patch16-224
 DATASET=cifar100
 
-export CUDA_VISIBLE_DEVICES=5,6,7
+#export CUDA_VISIBLE_DEVICES=5,6,7
 export WANDB_PROJECT=${BACKBONE}_${DATANAME}
 
 python ../examples/run_base_deit.py \
