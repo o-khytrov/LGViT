@@ -17,7 +17,7 @@ python ../examples/run_base_deit.py \
     --dataset_name $DATASET \
     --backbone $BACKBONE \
     --model_name_or_path $MODEL_NAME \
-    --output_dir ../saved_models/$MODEL_TYPE/$DATASET/base \
+    --output_dir /content/drive/MyDrive/Sumdu/PhD/LGViT/$MODEL_TYPE/$DATASET/base \
     --overwrite_output_dir True \
     --remove_unused_columns False \
     --do_train \
@@ -33,4 +33,5 @@ python ../examples/run_base_deit.py \
     --load_best_model_at_end True \
     --save_total_limit 3 \
     --seed 777 \
-    --ignore_mismatched_sizes=True
+    --ignore_mismatched_sizes=True \
+    --push_to_hub=True \
