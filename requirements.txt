@@ -7,3 +7,4 @@ timm
 wandb
 ipykernel
 scikit-learn
+accelerate

@@ -34,7 +34,8 @@ from torchvision.transforms import (
     ToTensor,
 )
 
-from models.deit_highway import DeiTForImageClassification, DeiTForImageClassificationWithTeacher, DeiTConfig, DeiTImageProcessor
+from models.deit_highway import DeiTForImageClassification, DeiTForImageClassificationWithTeacher, DeiTConfig, \
+    DeiTImageProcessor
 
 import transformers
 from transformers import (
@@ -50,7 +51,6 @@ from transformers import (
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version, send_example_telemetry
 from transformers.utils.versions import require_version
-
 
 """ Fine-tuning a 🤗 Transformers model for image classification"""
 
@@ -168,7 +168,7 @@ class ModelArguments:
 
 def collate_fn(examples):
     pixel_values = torch.stack([example["pixel_values"] for example in examples])
-    labels = torch.tensor([example["labels"] for example in examples])
+    labels = torch.tensor([example["fine_label"] for example in examples])
     return {"pixel_values": pixel_values, "labels": labels}
 
 
@@ -270,7 +270,7 @@ def main():
 
     # Prepare label mappings.
     # We'll include these in the model's config to get human readable labels in the Inference API.
-    labels = dataset["train"].features["labels"].names
+    labels = dataset["train"].features["fine_label"].names
     label2id, id2label = dict(), dict()
     for i, label in enumerate(labels):
         label2id[label] = str(i)
@@ -353,7 +353,7 @@ def main():
     def train_transforms(example_batch):
         """Apply _train_transforms across a batch."""
         example_batch["pixel_values"] = [
-            _train_transforms(pil_img.convert("RGB")) for pil_img in example_batch["image"]
+            _train_transforms(pil_img.convert("RGB")) for pil_img in example_batch["img"]
         ]
         return example_batch
 
@@ -426,6 +426,37 @@ def main():
 
 
 if __name__ == "__main__":
+    def add_argument(arg, val=None):
+        sys.argv.append(arg)
+        if val:
+            sys.argv.append(val)
+
+
     sys.path.append('/usr/local/anaconda3/envs/tf_hjw/lib/python3.9/site-packages/transformers')
     sys.path.append('/usr/local/anaconda3/envs/tf_hjw/lib/python3.9/site-packages/transformers/trainer.py')
+    BACKBONE = "DeiT"
+    MODEL_TYPE = f"{BACKBONE} - base"
+    MODEL_NAME = "facebook/deit-base-distilled-patch16-224"
+    DATASET = "cifar100"
+    output_dir = f"../saved_models/{MODEL_TYPE}/{DATASET}/base"
+    add_argument("--run_name", f"{BACKBONE}-base")
+    add_argument("--dataset_name", DATASET)
+    add_argument("--model_name_or_path", MODEL_NAME)
+    add_argument("--output_dir", output_dir)
+    add_argument("--overwrite_output_dir", "True")
+    add_argument("--remove_unused_columns", "False")
+    add_argument("--do_train")
+    add_argument("--do_eval")
+    add_argument("--learning_rate", "5e-5")
+    add_argument("--num_train_epochs", "10")
+    add_argument("--per_device_train_batch_size", "64")
+    add_argument("--per_device_eval_batch_size", "1")
+    add_argument("--logging_strategy", "steps")
+    add_argument("--logging_steps", "50")
+    add_argument("--evaluation_strategy", "epoch")
+    add_argument("--save_strategy", "epoch")
+    add_argument("--load_best_model_at_end", "True")
+    add_argument("--save_total_limit", "3")
+    add_argument("--seed", "777")
+    add_argument("--ignore_mismatched_sizes", "True")
     main()
