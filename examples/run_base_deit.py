@@ -402,6 +402,7 @@ def main():
             checkpoint = training_args.resume_from_checkpoint
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
+        trainer
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         trainer.save_model()
         trainer.log_metrics("train", train_result.metrics)
@@ -433,7 +434,7 @@ def local_debugging():
             sys.argv.append(val)
 
     BACKBONE = "DeiT"
-    MODEL_TYPE = f"{BACKBONE} - base"
+    MODEL_TYPE = f"{BACKBONE}-base"
     MODEL_NAME = "facebook/deit-base-distilled-patch16-224"
     DATASET = "cifar100"
     output_dir = f"../saved_models/{MODEL_TYPE}/{DATASET}/base"
