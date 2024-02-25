@@ -12,7 +12,7 @@ DATASET=cifar100
 export CUDA_VISIBLE_DEVICES=5,6,7
 export WANDB_PROJECT=${BACKBONE}_${DATANAME}
 
-python -m torch.distributed.launch --nproc_per_node=3 --nnodes=1 ../examples/run_base_deit.py \
+python ../examples/run_base_deit.py \
     --report_to wandb \
     --run_name ${BACKBONE}-base \
     --dataset_name $DATASET \
