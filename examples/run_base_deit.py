@@ -176,7 +176,7 @@ def main():
     # See all possible arguments in src/transformers/training_args.py
     # or by passing the --help flag to this script.
     # We now keep distinct sets of args, for a cleaner separation of concerns.
-
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
     if len(sys.argv) == 2 and sys.argv[1].endswith(".json"):
         # If we pass only one argument to the script and it's the path to a json file,
@@ -353,13 +353,13 @@ def main():
     def train_transforms(example_batch):
         """Apply _train_transforms across a batch."""
         example_batch["pixel_values"] = [
-            _train_transforms(pil_img.convert("RGB")) for pil_img in example_batch["img"]
+            _train_transforms(pil_img.convert("RGB")).to(device) for pil_img in example_batch["img"]
         ]
         return example_batch
 
     def val_transforms(example_batch):
         """Apply _val_transforms across a batch."""
-        example_batch["pixel_values"] = [_val_transforms(pil_img.convert("RGB")) for pil_img in example_batch["img"]]
+        example_batch["pixel_values"] = [_val_transforms(pil_img.convert("RGB")).to(device) for pil_img in example_batch["img"]]
         return example_batch
 
     if training_args.do_train:
@@ -372,6 +372,7 @@ def main():
         # Set the training transforms
         dataset["train"].set_transform(train_transforms)
 
+
     if training_args.do_eval:
         if "validation" not in dataset:
             raise ValueError("--do_eval requires a validation dataset")
@@ -381,6 +382,9 @@ def main():
             )
         # Set the validation transforms
         dataset["validation"].set_transform(val_transforms)
+
+
+    model.to(device)
 
     # Initalize our trainer
     trainer = Trainer(
@@ -424,16 +428,12 @@ def main():
     else:
         trainer.create_model_card(**kwargs)
 
-
-if __name__ == "__main__":
+def local_debugging():
     def add_argument(arg, val=None):
         sys.argv.append(arg)
         if val:
             sys.argv.append(val)
 
-
-    sys.path.append('/usr/local/anaconda3/envs/tf_hjw/lib/python3.9/site-packages/transformers')
-    sys.path.append('/usr/local/anaconda3/envs/tf_hjw/lib/python3.9/site-packages/transformers/trainer.py')
     BACKBONE = "DeiT"
     MODEL_TYPE = f"{BACKBONE} - base"
     MODEL_NAME = "facebook/deit-base-distilled-patch16-224"
@@ -459,4 +459,9 @@ if __name__ == "__main__":
     add_argument("--save_total_limit", "3")
     add_argument("--seed", "777")
     add_argument("--ignore_mismatched_sizes", "True")
+
+if __name__ == "__main__":
+    sys.path.append('/usr/local/anaconda3/envs/tf_hjw/lib/python3.9/site-packages/transformers')
+    sys.path.append('/usr/local/anaconda3/envs/tf_hjw/lib/python3.9/site-packages/transformers/trainer.py')
+    local_debugging()
     main()
